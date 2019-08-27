@@ -15,7 +15,7 @@ exports.SQL422Errors = (err, req, res, next) => {
   const errorCodes = ['23503'];
   if (errorCodes.includes(err.code)) {
     res.status(422).send({
-      msg: 'Unprocessable Entity'
+      msg: 'Unprocessable entity!'
     });
   } else next(err);
 };

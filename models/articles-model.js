@@ -18,16 +18,13 @@ exports.fetchArticleByArticleId = article_id => {
 };
 
 exports.updateVotes = (article_id, inc_votes) => {
-  if (article_id === undefined && inc_votes === undefined) {
-    return Promise.reject({ status: 400, msg: 'Bad request!' });
-  } else
-    return connection
-      .select('votes.*')
-      .from('articles')
-      .increment('votes', inc_votes)
-      .where({ article_id })
-      .returning('*')
-      .then(articleData => {
-        return articleData[0];
-      });
+  return connection
+    .select('votes.*')
+    .from('articles')
+    .increment('votes', inc_votes)
+    .where({ article_id })
+    .returning('*')
+    .then(articleData => {
+      return articleData[0];
+    });
 };
