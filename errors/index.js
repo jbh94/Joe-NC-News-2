@@ -20,6 +20,15 @@ exports.SQL422Errors = (err, req, res, next) => {
   } else next(err);
 };
 
+// exports.SQLNullError = (err, req, res, next) => {
+//   const errorCodes = ['23502'];
+//   if (errorCodes.includes(err.code)) {
+//     res.status(400).send({
+//       msg: 'Comment failed to post!'
+//     });
+//   } else next(err);
+// };
+
 exports.routeError = (req, res, next) => {
   res.status(404).send({ msg: 'Route not found!' });
 };
@@ -31,6 +40,7 @@ exports.customErrors = (err, req, res, next) => {
 };
 
 exports.serverError = (err, req, res, next) => {
+  console.log(err);
   res.status(500).send({
     msg: 'Internal server error'
   });

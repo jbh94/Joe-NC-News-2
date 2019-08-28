@@ -217,7 +217,7 @@ describe('/api', () => {
             expect(body.comment.body).to.equal('Worlds best comment');
           });
       });
-      it('Status 422: Returns a messge if the passed in id is an unprocessable entity', () => {
+      it('Status 422: Returns a message if the passed in id is an unprocessable entity', () => {
         return request(app)
           .post('/api/articles/1000/comments')
           .send({ username: 'butter_bridge', body: 'Worlds best comment' })
@@ -235,6 +235,15 @@ describe('/api', () => {
             expect(body.msg).to.equal('Bad request!');
           });
       });
+      // it('Status 400: Returns a message if the posted object is empty', () => {
+      //   return request(app)
+      //     .post('/api/articles/1/comments')
+      //     .send({})
+      //     .expect(400)
+      //     .then(({ body }) => {
+      //       expect(body.msg).to.equal('Comment failed to post!');
+      //     });
+      // });
       it('Status 404: Returns a message if the passed endpoint is incorrect', () => {
         return request(app)
           .post('/api/articles/1/wrongpath')
@@ -285,8 +294,179 @@ describe('/api', () => {
   });
 
   describe('/api/articles/', () => {
+    describe('METHOD NOT ALLOWED', () => {
+      it('Status 405: Return a message if the wrong method is used on this endpoint', () => {
+        const invalidMethods = ['put', 'delete', 'patch'];
+        const returnError = invalidMethods.map(method => {
+          return request(app)
+            [method]('/api/articles')
+            .expect(405);
+        });
+        return Promise.all(returnError);
+      });
+    });
     describe('GET', () => {
-      it('Status 200: Returns a response articles array of article objects', () => {});
+      it('Status 200: Returns a response articles array of article objects with a comment count', () => {
+        return request(app)
+          .get('/api/articles')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).to.be.an('array');
+            expect(body.articles[0]).to.be.an('object');
+            expect(body.articles[0]).to.have.keys(
+              'author',
+              'title',
+              'article_id',
+              'topic',
+              'created_at',
+              'votes',
+              'comment_count'
+            );
+          });
+      });
+      describe('SORT BY', () => {
+        it('Status 200: Returns a response of comments sorted descendingly by comment_id', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sort_by=comment_id')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).to.be.sortedBy('comment_id', {
+                descending: true
+              });
+            });
+        });
+        it('Status 200: Returns a response of comments sorted descendingly by created_at', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sort_by=created_at')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).to.be.sortedBy('created_at', {
+                descending: true
+              });
+            });
+        });
+        it('Status 200: Returns a response of comments sorted descendingly by votes', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sort_by=votes')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).to.be.sortedBy('votes', {
+                descending: true
+              });
+            });
+        });
+        it('Status 200: Returns a response of comments sorted descendingly by author', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sort_by=author')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).to.be.sortedBy('author', {
+                descending: true
+              });
+            });
+        });
+        it('Status 200: Returns a response of comments sorted descendingly by body', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sort_by=body')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).to.be.sortedBy('body', {
+                descending: true
+              });
+            });
+        });
+      });
+      describe('ORDER', () => {
+        it('Status 200: Returns a response of comments ordered by default to descending by comment_id', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sort_by=comment_id')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).to.be.descendingBy('comment_id');
+            });
+        });
+
+        it('Status 200: Returns a response of comments ordered descendingly by comment_id', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sort_by=comment_id&order=desc')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).to.be.descendingBy('comment_id');
+            });
+        });
+        it('Status 200: Returns a response of comments ordered descendingly by votes', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sort_by=votes&order=desc')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).to.be.descendingBy('votes');
+            });
+        });
+        it('Status 200: Returns a response of comments ordered descendingly by created_at', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sort_by=created_at&order=desc')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).to.be.descendingBy('created_at');
+            });
+        });
+        it('Status 200: Returns a response of comments ordered descendingly by author', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sort_by=author&order=desc')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).to.be.descendingBy('author');
+            });
+        });
+        it('Status 200: Returns a response of comments ordered descendingly by body', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sort_by=body&order=desc')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).to.be.descendingBy('body');
+            });
+        });
+        it('Status 200: Returns a response of comments ordered ascendingly by comment_id', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sort_by=comment_id&order=desc')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).to.be.descendingBy('comment_id');
+            });
+        });
+        it('Status 200: Returns a response of comments ordered ascendingly by votes', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sort_by=votes&order=asc')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).to.be.ascendingBy('votes');
+            });
+        });
+        it('Status 200: Returns a response of comments ordered ascendingly by created_at', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sort_by=created_at&order=asc')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).to.be.ascendingBy('created_at');
+            });
+        });
+        it('Status 200: Returns a response of comments ordered ascendingly by author', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sort_by=author&order=asc')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).to.be.ascendingBy('author');
+            });
+        });
+        it('Status 200: Returns a response of comments ordered ascendingly by body', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sort_by=body&order=asc')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).to.be.ascendingBy('body');
+            });
+        });
+      });
     });
   });
 });

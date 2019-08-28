@@ -9,7 +9,10 @@ exports.createComment = (req, res, next) => {
 };
 
 exports.getComment = (req, res, next) => {
-  fetchComment(req.params)
+  const { sort_by } = req.query;
+  const { order } = req.query;
+  const { article_id } = req.params;
+  fetchComment(article_id, sort_by, order)
     .then(comments => {
       res.status(200).send({ comments });
     })
