@@ -655,5 +655,121 @@ describe('/api', () => {
           });
       });
     });
+    describe('AUTHOR', () => {
+      it('Status 200: Returns a response object of an author filtered by the passed in username', () => {
+        return request(app)
+          .get('/api/articles?author=butter_bridge')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles[0]).to.have.all.keys(
+              'author',
+              'title',
+              'article_id',
+              'topic',
+              'created_at',
+              'votes',
+              'comment_count'
+            );
+            expect(body.articles[0].author).to.eql('butter_bridge');
+            expect(body.articles).to.have.length(3);
+          });
+      });
+      it('Status 404: Returns a message when author does not exist', () => {
+        return request(app)
+          .get('/api/articles?author=doesnotexist')
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Articles not found!');
+          });
+      });
+    });
+    describe('TOPIC', () => {
+      it('Status 200: Returns a response object of a topic filtered by the passed in topic name', () => {
+        return request(app)
+          .get('/api/articles?topic=mitch')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles[0]).to.have.all.keys(
+              'author',
+              'title',
+              'article_id',
+              'topic',
+              'created_at',
+              'votes',
+              'comment_count'
+            );
+            expect(body.articles[0].topic).to.eql('mitch');
+            expect(body.articles).to.have.length(11);
+          });
+      });
+      it('Status 404: Returns a message when topic does not exist', () => {
+        return request(app)
+          .get('/api/articles?topic=doesnotexist')
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Articles not found!');
+          });
+      });
+    });
+  });
+  describe('/api/comments/:comment_id', () => {
+    describe('METHOD NOT ALLOWED', () => {
+      it('Status 405: Return a message if the wrong method is used on this endpoint', () => {
+        const invalidMethods = ['put', 'get'];
+        const returnError = invalidMethods.map(method => {
+          return request(app)
+            [method]('/api/comments/:comment_id')
+            .expect(405);
+        });
+        return Promise.all(returnError);
+      });
+    });
+    describe('PATCH', () => {
+      it('Status 200: Returns a response with the updated comment', () => {
+        return request(app)
+          .patch('/api/comments/1')
+          .send({ inc_votes: 100 })
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.votes).to.equal(116);
+          });
+      });
+      it('Status 400: Bad request when passed an empty or incorrect object', () => {
+        return request(app)
+          .patch('/api/comments/1')
+          .send({})
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Bad request - inc_votes not found!');
+          });
+      });
+      it('Status 400: Bad request when sent an incorrect input', () => {
+        return request(app)
+          .patch('/api/comments/1')
+          .send({ inc_votes: 'joe' })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).to.equal(
+              'Wrong input for inc_votes - expected an number!'
+            );
+          });
+      });
+    });
+
+    describe('DELETE', () => {
+      it('Status 204: Deletes the chosen comment by comment_id', () => {
+        return request(app)
+          .delete('/api/comments/1')
+          .expect(204);
+      });
+      it('Status 404: Returns a message when the comment_id/comment does not exist', () => {
+        return request(app)
+          .delete('/api/comments/1000')
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Comment not found!');
+          });
+      });
+    });
   });
 });

@@ -29,7 +29,7 @@ exports.updateVotes = (article_id, inc_votes) => {
     });
 };
 
-exports.fetchArticles = ({ sort_by, order = 'asc' }) => {
+exports.fetchArticles = ({ sort_by, order = 'asc', author, topic }) => {
   return connection('articles')
     .select(
       'articles.author',
@@ -43,12 +43,13 @@ exports.fetchArticles = ({ sort_by, order = 'asc' }) => {
     .leftJoin('comments', 'articles.article_id', 'comments.article_id')
     .groupBy('articles.article_id')
     .orderBy(sort_by || 'created_at', order)
+    .modify(query => {
+      if (author) query.where('articles.author', author);
+      if (topic) query.where('articles.topic', topic);
+    })
     .then(articles => {
-      return articles;
+      if (!articles.length) {
+        return Promise.reject({ status: 404, msg: 'Articles not found!' });
+      } else return articles;
     });
-  // .then(articles => {
-  //   if (!articles.length) {
-  //     return Promise.reject({ status: 404, msg: 'Articles not found' });
-  //   } else return articles;
-  // });
 };
