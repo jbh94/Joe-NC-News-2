@@ -3,7 +3,7 @@ exports.methodNotFound = (req, res, next) => {
 };
 
 exports.SQL400Errors = (err, req, res, next) => {
-  const errorCodes = ['42703', '23502F', '22001', '22P02'];
+  const errorCodes = ['42703', '23502F', '22001', '22P02', '23502'];
   if (errorCodes.includes(err.code)) {
     res.status(400).send({
       msg: 'Bad request!'
@@ -19,15 +19,6 @@ exports.SQL422Errors = (err, req, res, next) => {
     });
   } else next(err);
 };
-
-// exports.SQLNullError = (err, req, res, next) => {
-//   const errorCodes = ['23502'];
-//   if (errorCodes.includes(err.code)) {
-//     res.status(400).send({
-//       msg: 'Comment failed to post!'
-//     });
-//   } else next(err);
-// };
 
 exports.routeError = (req, res, next) => {
   res.status(404).send({ msg: 'Route not found!' });

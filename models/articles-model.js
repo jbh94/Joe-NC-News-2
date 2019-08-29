@@ -17,7 +17,7 @@ exports.fetchArticleByArticleId = article_id => {
     });
 };
 
-exports.updateVotes = (article_id, inc_votes) => {
+exports.updateVotes = (article_id, inc_votes = 0) => {
   return connection
     .select('votes.*')
     .from('articles')
@@ -29,14 +29,14 @@ exports.updateVotes = (article_id, inc_votes) => {
     });
 };
 
-exports.fetchArticles = ({ sort_by, order = 'asc', author, topic }) => {
+exports.fetchArticles = ({ sort_by, order = 'desc', author, topic }) => {
   return connection('articles')
     .select(
       'articles.author',
       'articles.title',
       'articles.article_id',
       'articles.topic',
-      'articles.created_at',
+      'articles.created_at', 
       'articles.votes'
     )
     .count({ comment_count: 'comments.article_id' })

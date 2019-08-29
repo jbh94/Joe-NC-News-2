@@ -23,6 +23,18 @@ describe('/api', () => {
         expect(body.msg).to.equal('You have reached the API router!');
       });
   });
+  describe('METHOD NOT ALLOWED', () => {
+    it('Status 405: Return a message if the wrong method is used on this endpoint', () => {
+      const invalidMethods = ['put'];
+      const returnError = invalidMethods.map(method => {
+        return request(app)
+          [method]('/api')
+          .expect(405);
+      });
+      return Promise.all(returnError);
+    });
+  });
+
   it('Status 404: Return a message if an incorrect route is passed', () => {
     return request(app)
       .get('/api/route-not-found')
@@ -155,6 +167,14 @@ describe('/api', () => {
             expect(body.article.votes).to.equal(101);
           });
       });
+      it('Status 200: Returns the original response object if nothing is passed in as the patch', () => {
+        return request(app)
+          .patch('/api/articles/1')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.article.votes).to.equal(100);
+          });
+      });
       it('Status 200: Return a response object of a passed article_id, when a negative updated votes object is sent', () => {
         return request(app)
           .patch('/api/articles/1')
@@ -235,15 +255,14 @@ describe('/api', () => {
             expect(body.msg).to.equal('Bad request!');
           });
       });
-      // it('Status 400: Returns a message if the posted object is empty', () => {
-      //   return request(app)
-      //     .post('/api/articles/1/comments')
-      //     .send({})
-      //     .expect(400)
-      //     .then(({ body }) => {
-      //       expect(body.msg).to.equal('Comment failed to post!');
-      //     });
-      // });
+      it('Status 400: Returns a message and an empty object if nothing is sent', () => {
+        return request(app)
+          .post('/api/articles/1/comments')
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Bad request!');
+          });
+      });
       it('Status 404: Returns a message if the passed endpoint is incorrect', () => {
         return request(app)
           .post('/api/articles/1/wrongpath')
@@ -482,7 +501,10 @@ describe('/api', () => {
           .get('/api/articles?sort_by=author')
           .expect(200)
           .then(({ body }) => {
-            expect(body.articles).to.be.sortedBy('author');
+            expect(body.articles[0].author).to.equal('rogersop');
+            expect(body.articles).to.be.sortedBy('author', {
+              descending: true
+            });
           });
       });
       it('Status 200: Returns a response articles array of article objects sorted by comment_count', () => {
@@ -495,7 +517,9 @@ describe('/api', () => {
                 commentCount.comment_count
               ));
             });
-            expect(body.articles).to.be.sortedBy('comment_count');
+            expect(body.articles).to.be.sortedBy('comment_count', {
+              descending: true
+            });
           });
       });
       it('Status 200: Returns a response articles array of article objects sorted by title', () => {
@@ -503,7 +527,7 @@ describe('/api', () => {
           .get('/api/articles?sort_by=title')
           .expect(200)
           .then(({ body }) => {
-            expect(body.articles).to.be.sortedBy('title');
+            expect(body.articles).to.be.sortedBy('title', { descending: true });
           });
       });
       it('Status 200: Returns a response articles array of article objects sorted by article_id', () => {
@@ -511,7 +535,9 @@ describe('/api', () => {
           .get('/api/articles?sort_by=article_id')
           .expect(200)
           .then(({ body }) => {
-            expect(body.articles).to.be.sortedBy('article_id');
+            expect(body.articles).to.be.sortedBy('article_id', {
+              descending: true
+            });
           });
       });
       it('Status 200: Returns a response articles array of article objects sorted by topic', () => {
@@ -519,7 +545,7 @@ describe('/api', () => {
           .get('/api/articles?sort_by=topic')
           .expect(200)
           .then(({ body }) => {
-            expect(body.articles).to.be.sortedBy('topic');
+            expect(body.articles).to.be.sortedBy('topic', { descending: true });
           });
       });
       it('Status 200: Returns a response articles array of article objects sorted by created_at', () => {
@@ -527,7 +553,9 @@ describe('/api', () => {
           .get('/api/articles?sort_by=created_at')
           .expect(200)
           .then(({ body }) => {
-            expect(body.articles).to.be.sortedBy('created_at');
+            expect(body.articles).to.be.sortedBy('created_at', {
+              descending: true
+            });
           });
       });
       it('Status 200: Returns a response articles array of article objects sorted by votes', () => {
@@ -535,7 +563,7 @@ describe('/api', () => {
           .get('/api/articles?sort_by=votes')
           .expect(200)
           .then(({ body }) => {
-            expect(body.articles).to.be.sortedBy('votes');
+            expect(body.articles).to.be.sortedBy('votes', { descending: true });
           });
       });
     });
