@@ -25,7 +25,7 @@ describe('/api', () => {
   });
   describe('METHOD NOT ALLOWED', () => {
     it('Status 405: Return a message if the wrong method is used on this endpoint', () => {
-      const invalidMethods = ['put'];
+      const invalidMethods = ['put', 'patch', 'post', 'delete'];
       const returnError = invalidMethods.map(method => {
         return request(app)
           [method]('/api')
@@ -224,7 +224,7 @@ describe('/api', () => {
           .send({ username: 'butter_bridge', body: 'Worlds best comment' })
           .expect(201)
           .then(({ body }) => {
-            expect(body.comment).to.have.all.keys(
+            expect(body.comment).to.have.keys(
               'comment_id',
               'author',
               'article_id',
@@ -258,6 +258,15 @@ describe('/api', () => {
       it('Status 400: Returns a message and an empty object if nothing is sent', () => {
         return request(app)
           .post('/api/articles/1/comments')
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Bad request!');
+          });
+      });
+      it('Status 400: Returns a message if all of the required keys are not present', () => {
+        return request(app)
+          .post('/api/articles/1/comments')
+          .send({ username: 'butter_bridge' })
           .expect(400)
           .then(({ body }) => {
             expect(body.msg).to.equal('Bad request!');
@@ -775,7 +784,7 @@ describe('/api', () => {
           .send({ inc_votes: 100 })
           .expect(200)
           .then(({ body }) => {
-            expect(body.votes).to.equal(116);
+            expect(body.comment.votes).to.equal(116);
           });
       });
       it('Status 400: Bad request when passed an empty or incorrect object', () => {
@@ -796,6 +805,15 @@ describe('/api', () => {
             expect(body.msg).to.equal(
               'Wrong input for inc_votes - expected an number!'
             );
+          });
+      });
+      it('Status 404: Returns a message when the comment_id/comment does not exist', () => {
+        return request(app)
+          .patch('/api/comments/1000')
+          .send({ inc_votes: 1 })
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Comment not found!');
           });
       });
     });

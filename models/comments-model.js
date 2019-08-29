@@ -48,7 +48,9 @@ exports.patchComment = ({ comment_id }, { inc_votes, ...params }) => {
     .increment('votes', inc_votes)
     .returning('*')
     .then(comment => {
-      return comment[0];
+      if (!comment.length) {
+        return Promise.reject({ status: 404, msg: 'Comment not found!' });
+      } else return comment[0];
     });
 };
 

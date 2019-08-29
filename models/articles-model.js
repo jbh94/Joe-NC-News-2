@@ -36,7 +36,7 @@ exports.fetchArticles = ({ sort_by, order = 'desc', author, topic }) => {
       'articles.title',
       'articles.article_id',
       'articles.topic',
-      'articles.created_at', 
+      'articles.created_at',
       'articles.votes'
     )
     .count({ comment_count: 'comments.article_id' })

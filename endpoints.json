@@ -55,7 +55,7 @@
   },
   "GET /api/articles/:article_id/comments": {
     "description": "serves a response object of all comments in relation to the article_id",
-    
+    "exampleResponse": {}
   },
   "POST /api/articles/:article_id/comments": {},
   "PATCH /api/comments/:comment_id": {},
