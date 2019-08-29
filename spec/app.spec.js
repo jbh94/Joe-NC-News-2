@@ -188,7 +188,7 @@ describe('/api', () => {
   describe('/articles/:article_id/comments', () => {
     describe('METHOD NOT ALLOWED', () => {
       it('Status 405: Return a message if the wrong method is used on this endpoint', () => {
-        const invalidMethods = ['put', 'delete', 'patch'];
+        const invalidMethods = ['put', 'patch'];
         const returnError = invalidMethods.map(method => {
           return request(app)
             [method]('/api/articles/1/comments')
@@ -469,6 +469,14 @@ describe('/api', () => {
       });
     });
     describe('SORT BY', () => {
+      it('Status 400: Returns a response articles array of article objects sorted by author', () => {
+        return request(app)
+          .get('/api/articles?sort_by=badrequest')
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Bad request!');
+          });
+      });
       it('Status 200: Returns a response articles array of article objects sorted by author', () => {
         return request(app)
           .get('/api/articles?sort_by=author')
@@ -652,6 +660,14 @@ describe('/api', () => {
               ));
             });
             expect(body.articles).to.be.descendingBy('comment_count');
+          });
+      });
+      it('Status 400: Returns a response articles array of article objects sorted by author', () => {
+        return request(app)
+          .get('/api/articles?sort_by=badrequest&order=badorder')
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Bad request!');
           });
       });
     });
