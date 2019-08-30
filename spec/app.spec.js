@@ -302,6 +302,14 @@ describe('/api', () => {
             expect(body.comments[0]).to.be.an('object');
           });
       });
+      it('Status 200: Returns an empty array when the article exists but has no comments', () => {
+        return request(app)
+          .get('/api/articles/2/comments')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments).to.eql([]);
+          });
+      });
       it('Status 400: Returns an message when the passed article_id is a bad request', () => {
         return request(app)
           .get('/api/articles/cat/comments')
@@ -315,7 +323,7 @@ describe('/api', () => {
           .get('/api/articles/100000/comments')
           .expect(404)
           .then(({ body }) => {
-            expect(body.msg).to.equal('Comment not found!');
+            expect(body.msg).to.equal('Article not found!');
           });
       });
     });
@@ -787,13 +795,13 @@ describe('/api', () => {
             expect(body.comment.votes).to.equal(116);
           });
       });
-      it('Status 400: Bad request when passed an empty or incorrect object', () => {
+      it('Status 200: Returns the unchanged comment if no inc_votes are passed in', () => {
         return request(app)
           .patch('/api/comments/1')
+          .expect(200)
           .send({})
-          .expect(400)
           .then(({ body }) => {
-            expect(body.msg).to.equal('Bad request - inc_votes not found!');
+            expect(body.comment.votes).to.equal(16);
           });
       });
       it('Status 400: Bad request when sent an incorrect input', () => {

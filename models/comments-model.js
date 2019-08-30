@@ -1,4 +1,5 @@
 const connection = require('../db/connection');
+const { fetchArticleByArticleId } = require('../models/articles-model');
 
 exports.postComment = ({ article_id }, { username, body }) => {
   return connection
@@ -18,21 +19,23 @@ exports.fetchComment = (article_id, sort_by = 'created_at', order = 'desc') => {
     .from('comments')
     .where('article_id', article_id)
     .orderBy(sort_by, order)
+    .modify(query => {
+      if (article_id) query.where({ article_id });
+    })
     .then(comments => {
-      if (!comments.length) {
-        return Promise.reject({ status: 404, msg: 'Comment not found!' });
-      }
-      return comments;
+      const checkIfArticleExists = comments.length
+        ? true
+        : fetchArticleByArticleId(article_id);
+      return Promise.all([comments, checkIfArticleExists]);
+    })
+    .then(([comments, articleExists]) => {
+      if (articleExists) return comments;
+      else return Promise.reject({ status: 404, msg: 'Comment not found!' });
     });
 };
 
-exports.patchComment = ({ comment_id }, { inc_votes, ...params }) => {
-  if (!inc_votes) {
-    return Promise.reject({
-      status: 400,
-      msg: 'Bad request - inc_votes not found!'
-    });
-  } else if (Object.keys(params).length) {
+exports.patchComment = ({ comment_id }, { inc_votes = 0, ...params }) => {
+  if (Object.keys(params).length) {
     return Promise.reject({
       status: 400,
       msg: 'Bad request - unexpected params!'
@@ -50,7 +53,8 @@ exports.patchComment = ({ comment_id }, { inc_votes, ...params }) => {
     .then(comment => {
       if (!comment.length) {
         return Promise.reject({ status: 404, msg: 'Comment not found!' });
-      } else return comment[0];
+      } else if (inc_votes === 'votes') return comment[0];
+      else return comment[0];
     });
 };
 
