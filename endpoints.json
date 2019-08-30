@@ -55,10 +55,95 @@
   },
   "GET /api/articles/:article_id/comments": {
     "description": "serves a response object of all comments in relation to the article_id",
-    "exampleResponse": {}
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 116,
+          "author": "weegembump",
+          "article_id": 5,
+          "votes": 3,
+          "created_at": "2017-10-18T13:06:42.375Z",
+          "body": "Praesentium dolor doloribus sint. Quisquam molestiae dolorum asperiores animi omnis."
+        },
+        {
+          "comment_id": 18,
+          "author": "jessjelly",
+          "article_id": 5,
+          "votes": 6,
+          "created_at": "2017-06-09T06:54:28.372Z",
+          "body": "Dicta aut quo unde cupiditate dolorum. Voluptas mollitia exercitationem vel porro dolor. Ea autem est pariatur."
+        },
+        {
+          "comment_id": 88,
+          "author": "weegembump",
+          "article_id": 5,
+          "votes": -3,
+          "created_at": "2017-01-17T21:47:53.849Z",
+          "body": "Minus minus sit non fugiat sunt et nostrum aut et. Dignissimos qui nemo quos fuga qui temporibus occaecati aut. Explicabo dolor commodi officia nulla totam inventore."
+        },
+        {
+          "comment_id": 238,
+          "author": "happyamy2016",
+          "article_id": 5,
+          "votes": 4,
+          "created_at": "2016-11-10T19:00:50.076Z",
+          "body": "Aut esse incidunt laborum enim nam voluptas enim deleniti dolores. Neque voluptas voluptatem. Est quia itaque aut est laudantium dolor. Esse vitae eum iste ut mollitia officiis architecto quo autem. Accusamus quod maiores quia incidunt veniam. Rerum adipisci sed quasi labore neque sit rem quam."
+        },
+        {
+          "comment_id": 144,
+          "author": "grumpy19",
+          "article_id": 5,
+          "votes": 19,
+          "created_at": "2016-06-22T20:30:38.075Z",
+          "body": "Placeat voluptatum consequatur ducimus et eum molestiae impedit eveniet. Recusandae rerum voluptas quia mollitia quam velit iusto. Eum eos similique minima necessitatibus nemo. Iure deleniti omnis enim animi iste delectus et consequuntur."
+        },
+        {
+          "comment_id": 149,
+          "author": "grumpy19",
+          "article_id": 5,
+          "votes": 10,
+          "created_at": "2016-05-08T16:52:35.708Z",
+          "body": "Accusamus vel vero aut quaerat quo nihil saepe. Eius quam consequatur explicabo sed est dolor soluta. Corporis enim possimus quo tempore voluptatem id. Sit et modi id ad eum deserunt. Aut voluptatem eum dolor eius. Aperiam ut quo rerum maxime omnis molestiae ipsum quibusdam laboriosam."
+        }
+      ]
+    }
   },
-  "POST /api/articles/:article_id/comments": {},
-  "PATCH /api/comments/:comment_id": {},
-  "DELETE /api/comments/:comment_id": {},
-  "GET /users/:username": {}
+  "POST /api/articles/:article_id/comments": {
+    "description": "serves a new response object for the new comment that has been passed in",
+    "exampleResponse": {
+      "comment_id": 19,
+      "author": "butter_bridge",
+      "article_id": 1,
+      "votes": 0,
+      "created_at": "2019-08-30T09:47:44.018Z",
+      "body": "Worlds best comment"
+    }
+  },
+
+  "PATCH /api/comments/:comment_id": {
+    "description": "serves an updated response object for the votes patched in to the particular comment_id",
+    "exampleResponse": {
+      "count": {
+        "comment_id": 1,
+        "author": "butter_bridge",
+        "article_id": 9,
+        "votes": 116,
+        "created_at": "2017-11-22T12:36:03.389Z",
+        "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+      }
+    }
+  },
+
+  "DELETE /api/comments/:comment_id": {
+    "description": "serves no content when the comment relating to the comment_id is deleted"
+  },
+
+  "GET /users/:username": {
+    "description": "serves a response object for the specific username that is passed in",
+    "exampleResponse": {
+      "username": "butter_bridge",
+      "name": "jonny",
+      "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+    }
+  }
 }
