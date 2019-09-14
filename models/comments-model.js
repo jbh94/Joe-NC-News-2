@@ -13,12 +13,20 @@ exports.postComment = ({ article_id }, { username, body }) => {
     });
 };
 
-exports.fetchComment = (article_id, sort_by = 'created_at', order = 'desc') => {
+exports.fetchComment = (
+  article_id,
+  sort_by = 'created_at',
+  order = 'desc',
+  limit = 10,
+  p
+) => {
   return connection
     .select('*')
     .from('comments')
     .where('article_id', article_id)
     .orderBy(sort_by, order)
+    .limit(limit)
+    .offset(p * limit - limit)
     .modify(query => {
       if (article_id) query.where({ article_id });
     })

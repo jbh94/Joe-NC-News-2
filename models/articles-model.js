@@ -29,7 +29,14 @@ exports.updateVotes = (article_id, inc_votes = 0) => {
     });
 };
 
-exports.fetchArticles = ({ sort_by, order = 'desc', author, topic }) => {
+exports.fetchArticles = ({
+  sort_by,
+  order = 'desc',
+  author,
+  topic,
+  limit = 10,
+  p
+}) => {
   return connection('articles')
     .select(
       'articles.author',
@@ -43,6 +50,8 @@ exports.fetchArticles = ({ sort_by, order = 'desc', author, topic }) => {
     .leftJoin('comments', 'articles.article_id', 'comments.article_id')
     .groupBy('articles.article_id')
     .orderBy(sort_by || 'created_at', order)
+    .limit(limit)
+    .offset(p * limit - limit)
     .modify(query => {
       if (author) query.where('articles.author', author);
       if (topic) query.where('articles.topic', topic);

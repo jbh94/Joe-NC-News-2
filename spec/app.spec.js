@@ -8,19 +8,15 @@ const app = require('../app');
 const connection = require('../db/connection');
 
 describe('/api', () => {
-  beforeEach(() => {
-    return connection.seed.run();
-  });
-  after(() => {
-    return connection.destroy();
-  });
+  beforeEach(() => connection.seed.run());
+  after(() => connection.destroy());
 
-  it('Status 200: API Router', () => {
+  it('Status 200: Returns a JSON object of all available endpoints', () => {
     return request(app)
       .get('/api')
       .expect(200)
       .then(({ body }) => {
-        expect(body.msg).to.equal('You have reached the API router!');
+        expect(body).to.contain.all.keys('GET /api');
       });
   });
   describe('METHOD NOT ALLOWED', () => {
@@ -297,7 +293,7 @@ describe('/api', () => {
               'author',
               'body'
             );
-            expect(body.comments).to.have.length(13);
+            expect(body.comments).to.have.length(10); // pagination implementation limiting to 10
             expect(body.comments).to.be.an('array');
             expect(body.comments[0]).to.be.an('object');
           });
@@ -501,6 +497,62 @@ describe('/api', () => {
               'votes',
               'comment_count'
             );
+          });
+      });
+      it('Status 200: Returns a response of all the articles with query set to 5', () => {
+        return request(app)
+          .get('/api/articles?limit=5')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).to.have.length(5);
+          });
+      });
+      it('Status 200: Returns a response of articles and expects the default query amount if none are set (10)', () => {
+        return request(app)
+          .get('/api/articles')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).to.have.length(10);
+          });
+      });
+      it('Status 200: Returns the default limit of articles when passed a p/page value of 1', () => {
+        return request(app)
+          .get('/api/articles?p=1')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).to.have.length(10);
+          });
+      });
+      it('Status 200: Returns the default limit of articles when passed a p/page value of 2', () => {
+        return request(app)
+          .get('/api/articles?p=2')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).to.have.length(2);
+          });
+      });
+      it('Status 200: Returns the amount of articles specified by the limit and page value passed in', () => {
+        return request(app)
+          .get('/api/articles?limit=6&&p=1')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).to.have.length(6);
+          });
+      });
+      it('Status 200: Returns the amount of articles specified by different limit and page value passed in', () => {
+        return request(app)
+          .get('/api/articles?limit=3&&p=2')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).to.have.length(3);
+          });
+      });
+      it("Status 400: Returns a message when accessing a page that doesn't exist", () => {
+        return request(app)
+          .get('/api/articles?limit=5&&p=10')
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Articles not found!');
           });
       });
     });
@@ -760,7 +812,7 @@ describe('/api', () => {
               'comment_count'
             );
             expect(body.articles[0].topic).to.eql('mitch');
-            expect(body.articles).to.have.length(11);
+            expect(body.articles).to.have.length(10);
           });
       });
       it('Status 404: Returns a message when topic does not exist', () => {
