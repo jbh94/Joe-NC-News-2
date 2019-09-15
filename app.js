@@ -9,7 +9,6 @@ const {
   SQL422Errors
 } = require('./errors');
 
-app.use(cors());
 app.use(express.json());
 
 app.use('/api', apiRouter);
